@@ -239,7 +239,6 @@ if show_dados:
     st.header("📊 Visualização dos Dados Gerais")
     st.dataframe(df.head(10), use_container_width=True)
     st.markdown("---")
-    st.caption("Desenvolvido por Silvia Laryssa – Streamlit + Plotly 📊")
 
 # ------------------------------
 # ANÁLISE EXPLORATÓRIA
@@ -556,6 +555,16 @@ if show_model:
             }
         df_interpretativa = pd.DataFrame(data_interpretativa)
         st.table(df_interpretativa)
+        st.markdown("### 🧩 Conclusões Estratégicas da Análise de Churn ")
+        st.markdown("""
+        - **Clientes ativos** têm menor probabilidade de churn. Invista em ações para ativar clientes inativos.
+        - **Número de produtos bancários** está negativamente relacionado ao churn. Estratégias de cross-selling podem ser eficazes.
+        - **Clientes da Alemanha** apresentam maior risco e devem ser analisados regionalmente.
+        - **Idade** é o fator mais crítico: quanto mais velho o cliente, maior a chance de churn. Personalize ofertas para esse público.
+        - **Saldo bancário** mostrou influência leve, sugerindo que retenção depende mais do engajamento do que do volume financeiro.
+        - **A geografia** tem impacto considerável. A Espanha demonstra maior fidelidade.
+        """)
+
         # Avaliação do desempenho com dados balanceados (SMOTE)
         y_prob = pipeline.predict_proba(X_resampled)[:, 1]
         avaliar_modelo_classificacao(y_true=y_resampled, y_pred=y_pred, y_prob=y_prob)
@@ -574,7 +583,7 @@ if show_model:
         
     else:
                 # Exemplo: salvar em sessão, ou atualizar os gráficos/predições
-        st.warning("⚠️ As classes já estão relativamente balanceadas. SMOTE não é necessário.")
+        #st.warning("⚠️ As classes já estão relativamente balanceadas. SMOTE não é necessário.")
 
             
     
@@ -630,19 +639,8 @@ if show_model:
 
         # Exibir a tabela no Streamlit
         st.table(df_interpretativa1)
-        
- 
 
-    st.markdown("### 🧩 Conclusões Estratégicas da Análise de Churn ")
-    st.markdown("""
-    - **Clientes ativos** têm menor probabilidade de churn. Invista em ações para ativar clientes inativos.
-    - **Número de produtos bancários** está negativamente relacionado ao churn. Estratégias de cross-selling podem ser eficazes.
-    - **Clientes da Alemanha** apresentam maior risco e devem ser analisados regionalmente.
-    - **Idade** é o fator mais crítico: quanto mais velho o cliente, maior a chance de churn. Personalize ofertas para esse público.
-    - **Saldo bancário** mostrou influência leve, sugerindo que retenção depende mais do engajamento do que do volume financeiro.
-    - **A geografia** tem impacto considerável. A Espanha demonstra maior fidelidade.
-    """)
-
+     
 
     st.markdown("---")
     st.caption("🔍 Coeficientes positivos aumentam a chance de churn; negativos indicam maior retenção.")
@@ -666,6 +664,6 @@ if show_model:
 
         ### 🔗 Links
 
-        - 📊 Projeto no HungginFace: [/]()  
+        - 📊 Projeto no HungginFace: [https://huggingface.co/spaces/silviabranco/regressaologistica](https://huggingface.co/spaces/silviabranco/regressaologistica)  
       
         """)
