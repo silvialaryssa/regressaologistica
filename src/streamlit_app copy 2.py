@@ -400,49 +400,6 @@ def reajustar_modelo_logistico(X, y):
 
     return pipeline, y_pred, coef_table
  
- 
-# #############################################
-from sklearn.metrics import roc_auc_score, roc_curve, accuracy_score, precision_score, recall_score, confusion_matrix
-import plotly.graph_objects as go
-
-def avaliar_modelo_classificacao(y_true, y_pred, y_prob):
-    st.subheader("D) 📊 Avaliação Preditiva do Modelo")
-
-    # Métricas principais
-    acuracia = accuracy_score(y_true, y_pred)
-    precisao = precision_score(y_true, y_pred)
-    recall = recall_score(y_true, y_pred)
-    auc = roc_auc_score(y_true, y_prob)
-
-    # Especificidade
-    cm = confusion_matrix(y_true, y_pred)
-    tn, fp, fn, tp = cm.ravel()
-    especificidade = tn / (tn + fp)
-
-    # Exibição das métricas
-    st.markdown("### 🔢 Métricas de Desempenho")
-    st.write(f"**🎯 Acurácia:** {acuracia:.2f}")
-    st.write(f"**📌 Precisão:** {precisao:.2f}")
-    st.write(f"**📈 Sensibilidade (Recall):** {recall:.2f}")
-    st.write(f"**🛡️ Especificidade:** {especificidade:.2f}")
-    st.write(f"**📉 AUC (Área sob a Curva ROC):** {auc:.2f}")
-
-    # Curva ROC
-    fpr, tpr, _ = roc_curve(y_true, y_prob)
-    fig_roc = go.Figure()
-    fig_roc.add_trace(go.Scatter(x=fpr, y=tpr, mode='lines', name='Curva ROC', line=dict(color='blue')))
-    fig_roc.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode='lines', name='Aleatório', line=dict(color='gray', dash='dash')))
-    fig_roc.update_layout(
-        title='Curva ROC',
-        xaxis_title='Taxa de Falsos Positivos (1 - Especificidade)',
-        yaxis_title='Taxa de Verdadeiros Positivos (Sensibilidade)',
-        width=700,
-        height=500
-    )
-    st.plotly_chart(fig_roc, use_container_width=True)
-
-
-############################################## 
 
 # ------------------------------
 # MODELAGEM COM REGRESSÃO LOGÍSTICA
@@ -459,7 +416,7 @@ if show_model:
     # ------------------------------
     # VALIDAÇÃO DOS PRESSUPOSTOS DA REGRESSÃO LOGÍSTICA
     # ------------------------------
-    st.header("B) 📏 Validação dos Pressupostos da Regressão Logística")
+    st.header("📏 Validação dos Pressupostos da Regressão Logística")
 
     val_result = validar_pressupostos_logistica(X_test, y_test, pipeline)
     diagnostico_agrupamentos(pipeline, X_test, y_test)
@@ -554,86 +511,84 @@ if show_model:
                     "Clientes ativos têm 42,4% menos chance de churn. Fator importante de retenção no modelo."
                 ]
             }
-        df_interpretativa = pd.DataFrame(data_interpretativa)
-        st.table(df_interpretativa)
-        # Avaliação do desempenho com dados balanceados (SMOTE)
-        y_prob = pipeline.predict_proba(X_resampled)[:, 1]
-        avaliar_modelo_classificacao(y_true=y_resampled, y_pred=y_pred, y_prob=y_prob)
-        st.markdown("""
-        ### 📊 Interpretação das Métricas de Desempenho
-
-        - **Acurácia (0.72):** 72% das previsões totais foram corretas.  
-        - **Precisão (0.72):** 72% dos clientes previstos como churn realmente saíram.  
-        - **Sensibilidade/Recall (0.73):** O modelo identificou corretamente 73% dos clientes que saíram.  
-        - **Especificidade (0.72):** Acertou 72% dos clientes que permaneceram.  
-        - **AUC (0.78):** Boa capacidade geral de distinguir entre quem sai e quem fica.
-
-        ✅ O modelo apresenta **desempenho equilibrado** e é adequado para **ações estratégicas de retenção**.
-        """)  
-
+            df_interpretativa = pd.DataFrame(data_interpretativa)
+            st.table(df_interpretativa)
         
-    else:
+        
+        else:
                 # Exemplo: salvar em sessão, ou atualizar os gráficos/predições
-        st.warning("⚠️ As classes já estão relativamente balanceadas. SMOTE não é necessário.")
+            st.warning("⚠️ As classes já estão relativamente balanceadas. SMOTE não é necessário.")
 
             
     
-        # dataframe com a interpretação dos coeficientes
-        st.header("📊 Tabela Interpretativa dos Coeficientes antes do SMOTE")
+    # dataframe com a interpretação dos coeficientes
+    st.header("📊 Tabela Interpretativa dos Coeficientes antes do SMOTE")
 
-        # Dados da tabela interpretativa
-        data_interpretativa1 = {
-            "Variável": [
-                "geo__Geography_Germany",
-                "geo__Geography_Spain",
-                "remainder__Age",
-                "remainder__Balance",
-                "remainder__NumOfProducts",
-                "remainder__IsActiveMember"
-            ],
-            "Coeficiente": [
-                "+0.798",
-                "+0.084",
-                "+0.072",
-                "0",
-                "–0.075",
-                "–1.059"
-            ],
-            "Odds Ratio": [
-                "2.222",
-                "1.088",
-                "1.075",
-                "1.000",
-                "0.928",
-                "0.347"
-            ],
-            "Impacto sobre o Churn (%)": [
-                "+122,2%",
-                "+8,8%",
-                "+7,5% por ano",
-                "0%",
-                "–7,2% por produto",
-                "–65,3%"
-            ],
-            "Interpretação Detalhada": [
-                "Clientes da Alemanha têm 2,2x mais chance de churn do que clientes da França (grupo base). Forte associação com saída.",
-                "Clientes da Espanha têm 8,8% mais chance de churn comparado à França. Efeito pequeno, quase neutro.",
-                "A cada ano a mais de idade, a chance de churn aumenta em 7,5%, sugerindo maior saída entre clientes mais velhos.",
-                "O saldo na conta não teve efeito significativo sobre o churn neste modelo.",
-                "Cada produto bancário adicional reduz a chance de churn em 7,2%. Clientes com mais produtos são mais fiéis.",
-                "Clientes ativos têm 65,3% menos chance de churn. É o fator mais forte de retenção no modelo."
-            ]
-        }
+    # Dados da tabela interpretativa
+    data_interpretativa1 = {
+        "Variável": [
+            "geo__Geography_Germany",
+            "geo__Geography_Spain",
+            "remainder__Age",
+            "remainder__Balance",
+            "remainder__NumOfProducts",
+            "remainder__IsActiveMember"
+        ],
+        "Coeficiente": [
+            "+0.798",
+            "+0.084",
+            "+0.072",
+            "0",
+            "–0.075",
+            "–1.059"
+        ],
+        "Odds Ratio": [
+            "2.222",
+            "1.088",
+            "1.075",
+            "1.000",
+            "0.928",
+            "0.347"
+        ],
+        "Impacto sobre o Churn (%)": [
+            "+122,2%",
+            "+8,8%",
+            "+7,5% por ano",
+            "0%",
+            "–7,2% por produto",
+            "–65,3%"
+        ],
+        "Interpretação Detalhada": [
+            "Clientes da Alemanha têm 2,2x mais chance de churn do que clientes da França (grupo base). Forte associação com saída.",
+            "Clientes da Espanha têm 8,8% mais chance de churn comparado à França. Efeito pequeno, quase neutro.",
+            "A cada ano a mais de idade, a chance de churn aumenta em 7,5%, sugerindo maior saída entre clientes mais velhos.",
+            "O saldo na conta não teve efeito significativo sobre o churn neste modelo.",
+            "Cada produto bancário adicional reduz a chance de churn em 7,2%. Clientes com mais produtos são mais fiéis.",
+            "Clientes ativos têm 65,3% menos chance de churn. É o fator mais forte de retenção no modelo."
+        ]
+    }
 
+    st.markdown("### 🧩 Conclusões Estratégicas da Análise de Churn")
+
+    st.markdown("""
+    - **Clientes ativos** têm muito menos chance de churn. É essencial investir em estratégias para engajar clientes inativos (como campanhas de reativação e uso do app).
+    - **Mais produtos bancários** reduzem o churn, sugerindo que ações de venda cruzada (cross-selling) aumentam a fidelização.
+    - **Clientes da Alemanha** apresentam maior risco de saída, exigindo intervenções regionais e análise de causas locais (como concorrência e oferta de serviços).
+    - **A idade** está positivamente associada ao churn. É necessário adaptar serviços e comunicação para faixas etárias mais velhas.
+    - **Saldo bancário** não influencia significativamente o churn, indicando que a retenção depende mais do relacionamento do que do volume financeiro.
+    - Esses achados apoiam **campanhas personalizadas**, **melhorias específicas por região** e **ajustes no portfólio de produtos**.
+    - O modelo permite tomadas de decisão mais **assertivas e direcionadas**, contribuindo fortemente para a **estratégia de retenção**.
+    """)
+
+
+    df_interpretativa1 = pd.DataFrame(data_interpretativa1)
+
+    # Exibir a tabela no Streamlit
+    st.table(df_interpretativa1)
     
-        df_interpretativa1 = pd.DataFrame(data_interpretativa1)
-
-        # Exibir a tabela no Streamlit
-        st.table(df_interpretativa1)
-        
  
 
-    st.markdown("### 🧩 Conclusões Estratégicas da Análise de Churn ")
+    st.markdown("### 🧩 Conclusões Estratégicas da Análise de Churn")
     st.markdown("""
     - **Clientes ativos** têm menor probabilidade de churn. Invista em ações para ativar clientes inativos.
     - **Número de produtos bancários** está negativamente relacionado ao churn. Estratégias de cross-selling podem ser eficazes.
@@ -643,29 +598,13 @@ if show_model:
     - **A geografia** tem impacto considerável. A Espanha demonstra maior fidelidade.
     """)
 
+    
+    
 
     st.markdown("---")
     st.caption("🔍 Coeficientes positivos aumentam a chance de churn; negativos indicam maior retenção.")
-    st.markdown("> **Interpretação:** Coeficientes positivos aumentam a chance de churn; negativos diminuem. A coluna `Odds Ratio` mostra quanto a chance é multiplicada para cada unidade da variável.")
+
     
-    st.markdown("""
-        ---
+   
 
-        ### 📚 Referências
-        - Field, A. (2009). *Descobrindo a estatística usando o SPSS*. 2. ed. Porto Alegre: Artmed, 2009
-        - Grus, J. (2021). Data science do zero: noções fundamentais com Python (2ª ed.). Alta Books.
-
-        ---
-
-        ### Autores
-        - **PPCA**: Programa de Computação Aplicada - UNB  
-        - **AEDI**: Análise Estatística de Dados e Informações  
-        - **Prof.** João Gabriel de Moraes Souza  
-        - **Aluna**: Silva Laryssa Branco da Silva  
-        - **Data**: 2025/07/18
-
-        ### 🔗 Links
-
-        - 📊 Projeto no HungginFace: [/]()  
-      
-        """)
+    st.markdown("> **Interpretação:** Coeficientes positivos aumentam a chance de churn; negativos diminuem. A coluna `Odds Ratio` mostra quanto a chance é multiplicada para cada unidade da variável.")
