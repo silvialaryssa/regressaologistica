@@ -664,6 +664,8 @@ if show_model:
 
         ### 🔗 Links
 
-        - 📊 Projeto no HungginFace: [https://huggingface.co/spaces/silviabranco/regressaologistica](https://huggingface.co/spaces/silviabranco/regressaologistica)  
+        - Projeto no HungginFace: [https://huggingface.co/spaces/silviabranco/regressaologistica](https://huggingface.co/spaces/silviabranco/regressaologistica)  
+        - Projeto Community Cloud: [https://regressaologisticaaeidunb.streamlit.app/](https://regressaologisticaaeidunb.streamlit.app/)    
+        - GITHub: [https://github.com/silvialaryssa/regressaologistica.git](https://github.com/silvialaryssa/regressaologistica)
       
         """)
